@@ -32,6 +32,7 @@ public enum SPAlertHaptic {
     case none
     
     func impact() {
+        #if !os(xrOS)
         let generator = UINotificationFeedbackGenerator()
         switch self {
         case .success:
@@ -43,5 +44,6 @@ public enum SPAlertHaptic {
         case .none:
             break
         }
+        #endif
     }
 }

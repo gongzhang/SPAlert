@@ -181,6 +181,7 @@ open class SPAlertView: UIView {
         
         // Present
         
+        #warning("FIXME: haptic is not available on xrOS")
         haptic.impact()
         
         UIView.animate(withDuration: presentDismissDuration, animations: {
