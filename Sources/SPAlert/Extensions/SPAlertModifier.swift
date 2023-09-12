@@ -8,9 +8,9 @@
 import SwiftUI
 
 public struct SPAlertConfiguration {
-    public var title: String
+    public var title: String? = nil
     public var message: String? = nil
-    public var icon: SPAlertIconPreset = .done
+    public var icon: SPAlertIconPreset? = nil
     public var layout: SPAlertLayout? = nil
     public var duration: TimeInterval = 2.0
     public var haptic: SPAlertHaptic = .none
@@ -64,10 +64,21 @@ struct SPAlertPlaceholderView: UIViewRepresentable {
         }
         
         func play() {
-            let alert = SPAlertView(title: configuration.title, message: configuration.message, preset: configuration.icon)
+            let alert = if let title = configuration.title {
+                SPAlertView(title: title, message: configuration.message, preset: configuration.icon ?? .done)
+            } else {
+                SPAlertView(message: configuration.message ?? "")
+            }
             presentedAlertView = alert
             
-            alert.layout = configuration.layout ?? SPAlertLayout(for: configuration.icon)
+            alert.layout = if let customLayout = configuration.layout {
+                customLayout
+            } else if let icon = configuration.icon {
+                SPAlertLayout(for: icon)
+            } else {
+                SPAlertLayout()
+            }
+            
             alert.dismissByTap = configuration.dismissOnTap
             alert.duration = configuration.duration
             alert.presentWindow = self.window
@@ -107,23 +118,42 @@ extension View {
         )
     }
     
+    public func spAlert(isPresented: Binding<Bool>,
+                        message: String,
+                        haptic: SPAlertHaptic = .none,
+                        customize: (inout SPAlertConfiguration) -> () = { _ in }) -> some View {
+        var configuration = SPAlertConfiguration(message: message,
+                                                 layout: .message(),
+                                                 haptic: haptic)
+        customize(&configuration)
+        
+        return self.background(
+            SPAlertPlaceholderView(isPresented: isPresented, configuration: configuration)
+        )
+    }
+    
 }
 
 @available(iOS 13.0, tvOS 13.0, *)
 struct SPAlertModifier_Previews: PreviewProvider {
     struct Preview: View {
-        @State private var isPresenting = false
+        @State private var isPresenting1 = false
+        @State private var isPresenting2 = false
         
         var body: some View {
             VStack {
                 Spacer()
-                Toggle("🔔", isOn: $isPresenting)
+                Toggle("🔔", isOn: $isPresenting1)
+                    .fixedSize()
+                Toggle("🔔", isOn: $isPresenting2)
                     .fixedSize()
             }
-            .spAlert(isPresented: $isPresenting,
+            .spAlert(isPresented: $isPresenting1,
                      title: "Alert",
                      message: "Message",
                      icon: .heart)
+            .spAlert(isPresented: $isPresenting2,
+                     message: "Message")
         }
         
     }
