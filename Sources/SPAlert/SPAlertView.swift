@@ -194,7 +194,15 @@ open class SPAlertView: UIView {
         }
     }
     
-    open func present(haptic: SPAlertHaptic = .success, completion: (() -> Void)? = nil) {
+    public func present(completion: (() -> Void)? = nil) {
+        #if os(visionOS)
+        present(haptic: .none, completion: completion)
+        #else
+        present(haptic: .success, completion: completion)
+        #endif
+    }
+    
+    open func present(haptic: SPAlertHaptic, completion: (() -> Void)? = nil) {
         
         if self.presentWindow == nil {
             self.presentWindow = UIApplication.shared.keyWindow
@@ -223,9 +231,9 @@ open class SPAlertView: UIView {
         }
         
         // Present
-        
-        #warning("FIXME: haptic is not available on xrOS")
+        #if !os(visionOS)
         haptic.impact()
+        #endif
         
         UIView.animate(withDuration: presentDismissDuration, animations: {
             self.alpha = 1

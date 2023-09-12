@@ -54,9 +54,24 @@ public extension SPAlertIconPreset {
     
     var haptic: SPAlertHaptic {
         switch self {
-        case .done: return .success
-        case .error: return .error
-        case .heart: return .success
+        case .done:
+            #if os(visionOS)
+            return .none
+            #else
+            return .success
+            #endif
+        case .error:
+            #if os(visionOS)
+            return .none
+            #else
+            return .error
+            #endif
+        case .heart:
+            #if os(visionOS)
+            return .none
+            #else
+            return .success
+            #endif
         case .spinner: return .none
         case .custom(_): return .none
         }

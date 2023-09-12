@@ -25,14 +25,17 @@ import UIKit
  SPAlert: Wrapper of haptic styles.
  */
 public enum SPAlertHaptic {
-    
+    @available(visionOS, unavailable)
     case success
+    @available(visionOS, unavailable)
     case warning
+    @available(visionOS, unavailable)
     case error
+    
     case none
     
+    #if !os(visionOS)
     func impact() {
-        #if !os(xrOS)
         let generator = UINotificationFeedbackGenerator()
         switch self {
         case .success:
@@ -44,6 +47,6 @@ public enum SPAlertHaptic {
         case .none:
             break
         }
-        #endif
     }
+    #endif
 }
