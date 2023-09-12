@@ -33,12 +33,36 @@ import UIKit
  
  Recomended call `SPAlert` and choose style func.
  */
+@available(iOSApplicationExtension, unavailable)
 open class SPAlertView: UIView {
+    
+    open var completion: (() -> Void)? = nil
     
     // MARK: - Properties
     
-    open var dismissByTap: Bool = true
-    open var completion: (() -> Void)? = nil
+    /**
+     SPAlert: Wrapper of corner radius of alert.
+     */
+    @objc dynamic open var cornerRadius: CGFloat = 8 {
+        didSet {
+            layer.cornerRadius = self.cornerRadius
+        }
+    }
+    
+    /**
+     SPAlert: Dismiss alert by tap in any place inside. By default is on.
+     */
+    @objc dynamic open var dismissByTap: Bool = true
+    
+    /**
+     SPAlert: Automatically dismiss in time or not. Duration of dismiss can be changed by property `duration`.
+     */
+    @objc dynamic open var dismissInTime: Bool = true
+    
+    /**
+     SPAlert: Duration for showing alert. If `dismissInTime` disabled, this property ignoring.
+     */
+    @objc dynamic open var duration: TimeInterval = 1.5
     
     // MARK: - Views
     
@@ -71,6 +95,15 @@ open class SPAlertView: UIView {
             setMessage(message)
         }
         setIcon(for: preset)
+        
+        switch preset {
+        case .spinner:
+            dismissInTime = false
+            dismissByTap = false
+        default:
+            dismissInTime = true
+            dismissByTap = true
+        }
     }
     
     public init(message: String) {
@@ -78,11 +111,15 @@ open class SPAlertView: UIView {
         commonInit()
         layout = SPAlertLayout.message()
         setMessage(message)
+        dismissInTime = true
+        dismissByTap = true
     }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonInit()
+        dismissInTime = true
+        dismissByTap = true
     }
     
     private func commonInit() {
@@ -90,15 +127,12 @@ open class SPAlertView: UIView {
         if #available(iOS 11.0, *) {
             insetsLayoutMarginsFromSafeArea = false
         }
+        
         layer.masksToBounds = true
-        layer.cornerRadius = 8
         backgroundColor = .clear
         addSubview(backgroundView)
         
-        if dismissByTap {
-            let tapGesterRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismiss))
-            addGestureRecognizer(tapGesterRecognizer)
-        }
+        setCornerRadius(self.cornerRadius)
     }
     
     // MARK: - Configure
@@ -133,6 +167,10 @@ open class SPAlertView: UIView {
         addSubview(view)
     }
     
+    private func setCornerRadius(_ value: CGFloat) {
+        layer.cornerRadius = value
+    }
+    
     // MARK: - Present
     
     fileprivate var presentDismissDuration: TimeInterval = 0.2
@@ -156,10 +194,10 @@ open class SPAlertView: UIView {
         }
     }
     
-    open func present(duration: TimeInterval = 1.5, haptic: SPAlertHaptic = .success, completion: (() -> Void)? = nil) {
+    open func present(haptic: SPAlertHaptic = .success, completion: (() -> Void)? = nil) {
         
         if self.presentWindow == nil {
-            self.presentWindow = UIApplication.shared.windows.first
+            self.presentWindow = UIApplication.shared.keyWindow
         }
         
         guard let window = self.presentWindow else { return }
@@ -179,6 +217,11 @@ open class SPAlertView: UIView {
         setFrame()
         transform = transform.scaledBy(x: self.presentDismissScale, y: self.presentDismissScale)
         
+        if dismissByTap {
+            let tapGesterRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismiss))
+            addGestureRecognizer(tapGesterRecognizer)
+        }
+        
         // Present
         
         #warning("FIXME: haptic is not available on xrOS")
@@ -187,12 +230,17 @@ open class SPAlertView: UIView {
         UIView.animate(withDuration: presentDismissDuration, animations: {
             self.alpha = 1
             self.transform = CGAffineTransform.identity
-        }, completion: { finished in
+        }, completion: { [weak self] finished in
+            guard let self = self else { return }
+            
             if let iconView = self.iconView as? SPAlertIconAnimatable {
                 iconView.animate()
             }
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
-                self.dismiss()
+            
+            if self.dismissInTime {
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + self.duration) {
+                    self.dismiss()
+                }
             }
         })
     }

@@ -24,6 +24,7 @@
 import SwiftUI
 
 @available(iOS 13.0, *)
+@available(iOSApplicationExtension, unavailable)
 extension View {
     
     public func spAlert(
@@ -38,7 +39,8 @@ extension View {
                 isPresent.wrappedValue = false
                 alertCompletion?()
             }
-            alertView.present(duration: duration, haptic: haptic, completion: alertDismiss)
+            alertView.duration = duration
+            alertView.present(haptic: haptic, completion: alertDismiss)
         }
         return self
     }

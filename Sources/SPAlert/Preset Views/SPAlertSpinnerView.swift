@@ -20,20 +20,32 @@
 // SOFTWARE.
 
 import UIKit
-import SparrowKit
-import SPAlert
 
-@UIApplicationMain
-class AppDelegate: SPAppWindowDelegate {
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let rootController = PresetsController().wrapToNavigationController(prefersLargeTitles: false)
-        makeKeyAndVisible(viewController: rootController, tint: .systemBlue)
-        
-        // If need to change for all alerts.
-        // SPAlertView.appearance().duration = 2
-        // SPAlertView.appearance().cornerRadius = 8
-        
-        return true
+class SPAlertSpinnerView: UIView {
+    
+    let activityIndicatorView: UIActivityIndicatorView = {
+        if #available(iOS 13.0, *) {
+            return UIActivityIndicatorView(style: .large)
+        } else {
+            return UIActivityIndicatorView()
+        }
+    }()
+    
+    init() {
+        super.init(frame: .zero)
+        self.backgroundColor = .clear
+        addSubview(activityIndicatorView)
+        activityIndicatorView.startAnimating()
     }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        activityIndicatorView.sizeToFit()
+        activityIndicatorView.center = .init(x: frame.width / 2, y: frame.height / 2)
+    }
+
 }
