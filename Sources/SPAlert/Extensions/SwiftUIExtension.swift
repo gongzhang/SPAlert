@@ -27,6 +27,7 @@ import SwiftUI
 @available(iOSApplicationExtension, unavailable)
 extension View {
     
+    @available(*, deprecated)
     public func spAlert(
         isPresent: Binding<Bool>,
         alertView: SPAlertView,
@@ -45,6 +46,7 @@ extension View {
         return self
     }
     
+    @available(*, deprecated)
     public func spAlert(isPresent: Binding<Bool>,
                         title: String = "",
                         message: String? = nil,
@@ -63,6 +65,7 @@ extension View {
         return spAlert(isPresent: isPresent, alertView: alertView, duration: duration, haptic: haptic)
     }
     
+    @available(*, deprecated)
     public func spAlert(isPresent: Binding<Bool>,
                         message: String,
                         duration: TimeInterval = 2.0,

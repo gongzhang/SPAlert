@@ -205,7 +205,11 @@ open class SPAlertView: UIView {
     open func present(haptic: SPAlertHaptic, completion: (() -> Void)? = nil) {
         
         if self.presentWindow == nil {
-            self.presentWindow = UIApplication.shared.keyWindow
+            #if os(visionOS)
+            assertionFailure("present window is nil")
+            #else
+            self.presentWindow = UIApplication.shared.lastInteractedKeyWindow
+            #endif
         }
         
         guard let window = self.presentWindow else { return }
