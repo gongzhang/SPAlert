@@ -133,6 +133,9 @@ open class SPAlertView: UIView {
         addSubview(backgroundView)
         
         setCornerRadius(self.cornerRadius)
+        if #available(iOS 13.0, *) {
+            layer.cornerCurve = .continuous
+        }
     }
     
     // MARK: - Configure
