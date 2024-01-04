@@ -31,7 +31,7 @@ struct SPAlertPlaceholderView: UIViewRepresentable {
         view.configuration = configuration
         
         if isPresented && view.presentedAlertView == nil {
-            view.play()
+            view.play(context: context)
             
         } else if !isPresented && view.presentedAlertView != nil {
             view.stop()
@@ -63,7 +63,7 @@ struct SPAlertPlaceholderView: UIViewRepresentable {
             fatalError("init(coder:) has not been implemented")
         }
         
-        func play() {
+        func play(context: SPAlertPlaceholderView.Context) {
             let alert = if let title = configuration.title {
                 SPAlertView(title: title, message: configuration.message, preset: configuration.icon ?? .done)
             } else {
@@ -82,6 +82,14 @@ struct SPAlertPlaceholderView: UIViewRepresentable {
             alert.dismissByTap = configuration.dismissOnTap
             alert.duration = configuration.duration
             alert.presentWindow = self.window
+            
+            // override color scheme from SwiftUI context
+            alert.overrideUserInterfaceStyle = switch context.environment.colorScheme {
+            case .light: .light
+            case .dark: .dark
+            @unknown default: .light
+            }
+            
             alert.present(haptic: configuration.haptic) { [weak self] in
                 self?.stop()
             }

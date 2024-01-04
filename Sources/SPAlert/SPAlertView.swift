@@ -180,6 +180,10 @@ open class SPAlertView: UIView {
     fileprivate var presentDismissScale: CGFloat = 0.8
     
     fileprivate var defaultContentColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return UIColor.secondaryLabel
+        }
+        
         let darkColor = UIColor(red: 127 / 255, green: 127 / 255, blue: 129 / 255, alpha: 1)
         let lightColor = UIColor(red: 88 / 255, green: 87 / 255, blue: 88 / 255, alpha: 1)
         if #available(iOS 12.0, *) {
