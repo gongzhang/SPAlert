@@ -40,10 +40,16 @@ open class SPAlertView: UIView {
     
     // MARK: - Properties
     
+    #if os(visionOS)
+    private static let defaultCornerRadius: CGFloat = 16
+    #else
+    private static let defaultCornerRadius: CGFloat = 12
+    #endif
+    
     /**
      SPAlert: Wrapper of corner radius of alert.
      */
-    @objc dynamic open var cornerRadius: CGFloat = 8 {
+    @objc dynamic open var cornerRadius: CGFloat = SPAlertView.defaultCornerRadius {
         didSet {
             layer.cornerRadius = self.cornerRadius
         }
@@ -72,11 +78,15 @@ open class SPAlertView: UIView {
     
     private lazy var backgroundView: UIVisualEffectView = {
         let view: UIVisualEffectView = {
+            #if os(visionOS)
+            return UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+            #else
             if #available(iOS 13.0, *) {
                 return UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
             } else {
                 return UIVisualEffectView(effect: UIBlurEffect(style: .light))
             }
+            #endif
         }()
         view.isUserInteractionEnabled = false
         return view
@@ -180,6 +190,9 @@ open class SPAlertView: UIView {
     fileprivate var presentDismissScale: CGFloat = 0.8
     
     fileprivate var defaultContentColor: UIColor {
+        #if os(visionOS)
+        return UIColor.label
+        #else
         if #available(iOS 13.0, *) {
             return UIColor.secondaryLabel
         }
@@ -199,6 +212,7 @@ open class SPAlertView: UIView {
         } else {
             return lightColor
         }
+        #endif
     }
     
     public func present(completion: (() -> Void)? = nil) {
