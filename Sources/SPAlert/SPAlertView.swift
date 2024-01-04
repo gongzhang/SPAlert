@@ -82,7 +82,7 @@ open class SPAlertView: UIView {
             return UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
             #else
             if #available(iOS 13.0, *) {
-                return UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
+                return UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
             } else {
                 return UIVisualEffectView(effect: UIBlurEffect(style: .light))
             }

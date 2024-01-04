@@ -150,7 +150,10 @@ struct SPAlertModifier_Previews: PreviewProvider {
         
         var body: some View {
             VStack {
-                Spacer()
+                VStack(spacing: 0) {
+                    Color(.systemGroupedBackground)
+                    Color(.systemBackground)
+                }
                 Toggle("🔔", isOn: $isPresenting1)
                     .fixedSize()
                 Toggle("🔔", isOn: $isPresenting2)
